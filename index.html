@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<title>体調報告フォーム</title>
+<style>
+  :root {
+    --bg: #f5f6f8;
+    --card: #ffffff;
+    --text: #1a1d21;
+    --sub: #6b7280;
+    --line: #e2e5ea;
+    --accent: #2563eb;
+    --accent-soft: #e8f0fe;
+    --code-bg: #1e2430;
+    --code-text: #e6edf3;
+    --ok: #16a34a;
+    --warn: #b45309;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14171c;
+      --card: #1d2128;
+      --text: #e8eaed;
+      --sub: #9aa3ae;
+      --line: #333943;
+      --accent: #5b9dff;
+      --accent-soft: #21304a;
+      --code-bg: #10141b;
+      --code-text: #e6edf3;
+      --ok: #4ade80;
+      --warn: #fbbf24;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px 12px 48px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", "Meiryo", sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+  }
+  .wrap { max-width: 560px; margin: 0 auto; }
+  header { margin-bottom: 16px; }
+  h1 { font-size: 1.25rem; margin: 0 0 4px; }
+  header p { margin: 0; color: var(--sub); font-size: 0.85rem; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 14px 16px;
+    margin-bottom: 12px;
+  }
+  .label {
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .label .num {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 6px;
+    font-size: 0.75rem;
+    padding: 1px 7px;
+    font-weight: 700;
+  }
+  .hint { color: var(--sub); font-weight: 400; font-size: 0.78rem; }
+
+  .options { display: flex; flex-direction: column; gap: 8px; }
+  .options.row { flex-direction: row; flex-wrap: wrap; }
+  .options.row label { flex: 1 1 auto; white-space: nowrap; }
+
+  label.opt {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background .12s, border-color .12s;
+  }
+  label.opt:active { background: var(--accent-soft); }
+  label.opt input { width: 20px; height: 20px; accent-color: var(--accent); margin: 0; flex: none; }
+  label.opt:has(input:checked) {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    font-weight: 600;
+  }
+  .mark { font-size: 1.05rem; font-weight: 700; min-width: 1.2em; text-align: center; }
+
+  input[type="text"], textarea {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px 12px;
+    font-size: 16px;
+    font-family: inherit;
+    background: var(--bg);
+    color: var(--text);
+  }
+  input[type="text"]:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  textarea { min-height: 80px; resize: vertical; }
+  #otherText { margin-top: 8px; }
+  .hidden { display: none !important; }
+
+  .out-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  pre {
+    background: var(--code-bg);
+    color: var(--code-text);
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin: 0;
+    max-height: 42vh;
+    overflow-y: auto;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-family: "SFMono-Regular", Consolas, "Courier New", monospace;
+    -webkit-user-select: all;
+    user-select: all;
+  }
+  button {
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 10px;
+    padding: 10px 16px;
+    background: var(--accent);
+    color: #fff;
+    cursor: pointer;
+  }
+  button.ghost {
+    background: transparent;
+    color: var(--sub);
+    border: 1px solid var(--line);
+    font-weight: 500;
+    padding: 8px 12px;
+  }
+  button:active { opacity: .8; }
+  button:disabled { background: var(--line); color: var(--sub); cursor: not-allowed; }
+  #copyBtn.done { background: var(--ok); }
+  .warn {
+    color: var(--warn);
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin: -2px 0 8px;
+  }
+
+  .sticky {
+    position: sticky;
+    bottom: 0;
+    padding-bottom: 4px;
+    z-index: 10;
+  }
+  .sticky .card {
+    margin-bottom: 0;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, .12);
+  }
+  @media (prefers-color-scheme: dark) {
+    .sticky .card { box-shadow: 0 -8px 24px rgba(0, 0, 0, .5); }
+  }
+  footer { text-align: center; margin-top: 20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>体調報告フォーム</h1>
+    <p>選択すると下部に報告文が生成されます。</p>
+  </header>
+
+  <div class="card">
+    <div class="label">氏名</div>
+    <input type="text" id="name" placeholder="例：田中" autocomplete="name">
+    <div class="hint" style="margin-top:6px;">※ 氏名はこの端末に保存され、次回から自動入力されます。</div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="num">①</span>体調</div>
+    <div class="options" id="condition"></div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="num">②</span>自覚症状<span class="hint">（複数選択可）</span></div>
+    <div class="options row" id="symptoms"></div>
+    <input type="text" id="otherText" class="hidden" placeholder="その他の症状を入力">
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="num">③</span>水分</div>
+    <div class="options row" id="water"></div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="num">④</span>食事</div>
+    <div class="options row" id="meal"></div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="num">⑤</span>睡眠・休養</div>
+    <div class="options row" id="sleep"></div>
+  </div>
+
+  <div class="card">
+    <div class="label"><span class="num">⑥</span>特記事項<span class="hint">（空欄なら「なし」）</span></div>
+    <textarea id="note" placeholder="あれば記載"></textarea>
+  </div>
+
+  <div class="sticky">
+    <div class="card">
+      <div class="out-head">
+        <div class="label" style="margin:0;">報告内容</div>
+        <button id="copyBtn" type="button">コピー</button>
+      </div>
+      <div class="warn hidden" id="warn">未入力・未選択の項目があります</div>
+      <pre id="output"></pre>
+    </div>
+  </div>
+
+  <footer><button class="ghost" id="resetBtn" type="button">選択をリセット</button></footer>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var CONDITIONS = [
+    { mark: "◎", text: "問題なし" },
+    { mark: "○", text: "少し疲労あり" },
+    { mark: "△", text: "体調不良あり" },
+    { mark: "×", text: "勤務継続困難" }
+  ];
+  var SYMPTOMS = ["なし", "頭痛", "めまい", "吐き気", "発熱感", "息苦しさ", "その他"];
+  var UNSET = "未選択";
+  var LEVELS = {
+    water: ["十分", "やや不足", "不足"],
+    meal:  ["問題なし", "やや不足", "不足"],
+    sleep: ["十分", "やや不足", "不足"]
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  // 初期値はあえて設けない。前回の選択や既定値をそのまま送ってしまうのを防ぐため、
+  // 毎回すべて未選択の状態から始める。
+  function makeOption(type, name, value, labelHtml) {
+    var label = document.createElement("label");
+    label.className = "opt";
+    var input = document.createElement("input");
+    input.type = type;
+    input.name = name;
+    input.value = value;
+    input.autocomplete = "off";
+    label.appendChild(input);
+    var span = document.createElement("span");
+    span.innerHTML = labelHtml;
+    label.appendChild(span);
+    return label;
+  }
+
+  // ① 体調
+  CONDITIONS.forEach(function (c) {
+    var html = '<span class="mark">' + c.mark + "</span> " + c.text;
+    $("condition").appendChild(makeOption("radio", "condition", c.mark, html));
+  });
+
+  // ② 自覚症状
+  SYMPTOMS.forEach(function (s) {
+    $("symptoms").appendChild(makeOption("checkbox", "symptom", s, s));
+  });
+
+  // ③④⑤
+  Object.keys(LEVELS).forEach(function (key) {
+    LEVELS[key].forEach(function (v) {
+      $(key).appendChild(makeOption("radio", key, v, v));
+    });
+  });
+
+  var symptomBoxes = function () {
+    return Array.prototype.slice.call(document.querySelectorAll('input[name="symptom"]'));
+  };
+
+  // 「なし」は他と排他
+  $("symptoms").addEventListener("change", function (e) {
+    var boxes = symptomBoxes();
+    if (e.target.value === "なし" && e.target.checked) {
+      boxes.forEach(function (b) { if (b.value !== "なし") b.checked = false; });
+    } else if (e.target.checked) {
+      boxes.forEach(function (b) { if (b.value === "なし") b.checked = false; });
+    }
+    var other = boxes.filter(function (b) { return b.value === "その他"; })[0];
+    $("otherText").classList.toggle("hidden", !other.checked);
+    if (!other.checked) $("otherText").value = "";
+    render();
+  });
+
+  function picked(name) {
+    var el = document.querySelector('input[name="' + name + '"]:checked');
+    return el ? el.value : "";
+  }
+
+  function symptomText() {
+    var vals = symptomBoxes()
+      .filter(function (b) { return b.checked; })
+      .map(function (b) {
+        if (b.value !== "その他") return b.value;
+        var t = $("otherText").value.trim();
+        return t ? "その他（" + t + "）" : "その他";
+      });
+    return vals.length ? vals.join("・") : UNSET;
+  }
+
+  function render() {
+    var note = $("note").value.trim();
+    var v = {
+      name: $("name").value.trim(),
+      condition: picked("condition"),
+      symptom: symptomText(),
+      water: picked("water"),
+      meal: picked("meal"),
+      sleep: picked("sleep")
+    };
+    $("output").textContent = [
+      "氏名：" + (v.name || "未入力"),
+      "体調：" + (v.condition || UNSET),
+      "自覚症状：" + v.symptom,
+      "水分：" + (v.water || UNSET),
+      "食事：" + (v.meal || UNSET),
+      "睡眠・休養：" + (v.sleep || UNSET),
+      "特記事項：" + (note ? note.replace(/\r\n|\r/g, "\n") : "なし")
+    ].join("\n");
+
+    // 未選択のまま送られないよう、全項目そろうまでコピーさせない
+    var incomplete = !v.name || !v.condition || !v.water || !v.meal || !v.sleep ||
+                     v.symptom === UNSET;
+    $("copyBtn").disabled = incomplete;
+    $("warn").classList.toggle("hidden", !incomplete);
+  }
+
+  // 毎回まっさらな状態から始める（ブラウザの入力復元・戻る操作の対策も兼ねる）
+  function clearAll() {
+    Array.prototype.slice.call(document.querySelectorAll(".options input"))
+      .forEach(function (el) { el.checked = false; });
+    $("otherText").value = "";
+    $("otherText").classList.add("hidden");
+    $("note").value = "";
+    render();
+  }
+
+  ["change", "input"].forEach(function (ev) {
+    document.addEventListener(ev, render);
+  });
+
+  // 氏名を端末に保存
+  try {
+    var saved = localStorage.getItem("healthReportName");
+    if (saved) $("name").value = saved;
+  } catch (e) {}
+  $("name").addEventListener("input", function () {
+    try { localStorage.setItem("healthReportName", $("name").value); } catch (e) {}
+  });
+
+  // コピー
+  $("copyBtn").addEventListener("click", function () {
+    var btn = this;
+    var text = $("output").textContent;
+    var done = function () {
+      btn.textContent = "コピーしました";
+      btn.classList.add("done");
+      setTimeout(function () {
+        btn.textContent = "コピー";
+        btn.classList.remove("done");
+      }, 1600);
+    };
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } else {
+      fallback();
+    }
+    function fallback() {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); }
+      catch (e) { alert("コピーできませんでした。長押しで選択してください。"); }
+      document.body.removeChild(ta);
+    }
+  });
+
+  // リセット（氏名だけは残す）
+  $("resetBtn").addEventListener("click", function () {
+    clearAll();
+    window.scrollTo(0, 0);
+  });
+
+  // 「戻る」やタブ復帰でブラウザが前回の選択を復元しても、必ず未選択に戻す
+  window.addEventListener("pageshow", clearAll);
+
+  clearAll();
+})();
+</script>
+</body>
+</html>
