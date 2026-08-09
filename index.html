@@ -179,6 +179,22 @@
     .sticky .card { box-shadow: 0 -8px 24px rgba(0, 0, 0, .5); }
   }
   footer { text-align: center; margin-top: 20px; }
+  .about {
+    margin-top: 20px;
+    text-align: left;
+    color: var(--sub);
+    font-size: 0.78rem;
+    line-height: 1.7;
+  }
+  .about summary {
+    cursor: pointer;
+    text-align: center;
+    padding: 6px;
+    color: var(--accent);
+  }
+  .about ul { margin: 6px 0 0; padding-left: 1.2em; }
+  .about li { margin-bottom: 4px; }
+  .about strong { color: var(--text); }
 </style>
 </head>
 <body>
@@ -237,7 +253,20 @@
     </div>
   </div>
 
-  <footer><button class="ghost" id="resetBtn" type="button">選択をリセット</button></footer>
+  <footer>
+    <button class="ghost" id="resetBtn" type="button">選択をリセット</button>
+
+    <details class="about">
+      <summary>このサイトについて</summary>
+      <ul>
+        <li>GitHub Pages で公開している静的サイトです。</li>
+        <li><strong>入力した内容はすべてブラウザ内で処理され、サーバーへ送信も保存もされません。</strong></li>
+        <li>氏名のみ、次回の入力を省くためこの端末のブラウザ内（localStorage）に保存されます。ブラウザの閲覧データを削除すれば消えます。</li>
+        <li>アクセス解析・広告・Cookie は使用しておらず、外部サービスへの通信もありません。</li>
+        <li>なお Web サイトの仕組み上、ページを開いた際の通信記録（IPアドレス等）が GitHub 側に残る場合があります。この記録に入力内容は含まれません。</li>
+      </ul>
+    </details>
+  </footer>
 
 </div>
 
